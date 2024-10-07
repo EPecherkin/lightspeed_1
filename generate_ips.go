@@ -12,7 +12,7 @@ import (
 const (
 	// totalFileSize = 1 * 1024 * 1024 // 1 MB for tests
 	totalFileSize = 1 * 1024 * 1024 * 1024 // 1 GB is enough
-	batchSize     = 100000          // Amount to store in memory before flushing
+	batchSize     = 100000                 // Amount to store in memory before flushing
 	outputFile    = "ips.txt"
 	duplicate     = 1000 // 1 / 1000 chance to duplicate an IP
 )
@@ -31,7 +31,7 @@ func main() {
 	}
 	defer file.Close()
 
-	totalBytesWritten := int64(0)
+	totalBytesWritten := uint64(0)
 
 	for totalBytesWritten < totalFileSize {
 		// Generate IPs and add them to the batch
@@ -53,7 +53,7 @@ func main() {
 			return
 		}
 
-		totalBytesWritten += int64(bytesWritten)
+		totalBytesWritten += uint64(bytesWritten)
 		fmt.Printf("\rBytes written: %d / %d", totalBytesWritten, totalFileSize)
 	}
 	fmt.Printf("\n")
