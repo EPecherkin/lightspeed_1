@@ -1,0 +1,10 @@
+version: "3.9"
+services:
+  lightspeed_1:
+    container_name: lightspeed_1
+    image: lightspeed_1
+    build: .
+    volumes:
+      - ./ips.txt:/app/ips.txt
+      # - ./run.sh:/app/run.sh
+      - ./perfmon.csv:/app/perfmon.csv

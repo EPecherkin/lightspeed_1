@@ -10,11 +10,10 @@ import (
 )
 
 const (
-	// totalFileSize = 1 * 1024 * 1024 // 1 MB for tests
-	totalFileSize = 1 * 1024 * 1024 * 1024 // 1 GB is enough
+	totalFileSize = 1 * 1024 * 1024 * 1024 // 1 GB
 	batchSize     = 100000                 // Amount to store in memory before flushing
+	duplicate     = 1000                   // 1 / 1000 chance to duplicate an IP
 	outputFile    = "ips.txt"
-	duplicate     = 1000 // 1 / 1000 chance to duplicate an IP
 )
 
 func generateRandomIP() string {
@@ -54,7 +53,7 @@ func main() {
 		}
 
 		totalBytesWritten += uint64(bytesWritten)
-		fmt.Printf("\rBytes written: %d / %d", totalBytesWritten, totalFileSize)
+		fmt.Printf("\rMBytes written: %d / %d", totalBytesWritten/(1024*1024), totalFileSize/(1024*1024))
 	}
 	fmt.Printf("\n")
 
