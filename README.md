@@ -35,7 +35,7 @@ You should calculate the number of unique addresses in this file using as little
 
 Performance on 1GB IPs:
 
-- `8.026510,6115,127,11,2` - 8 seconds, 6GB, bad and expected
+- 113 seconds, 12GB RAM. Bad as expected
 
 ## 2. Naive but a bit better
 
@@ -46,4 +46,9 @@ Performance on 1GB IPs:
 
 Performance on 1GB IPs:
 
--
+- 26 seconds, 14.5GB RAM
+
+Analysis:
+
+- Map works much faster with uint32 representation of IP.
+- I should manage memory better

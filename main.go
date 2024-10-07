@@ -12,7 +12,10 @@ const (
 func countIPs() {
 	hashset := map[uint32]bool{}
 	totalCount := uint32(0)
-  ips := make(chan [4]byte)
+
+	ips := make(chan [4]byte, 100)
+	go readIPs(filename, ips)
+
 	for ip := range ips {
 		totalCount += 1
 		hash := uint32(0)
