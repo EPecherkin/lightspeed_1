@@ -35,4 +35,20 @@ You should calculate the number of unique addresses in this file using as little
 
 Performance on 1GB IPs:
 
-- Took 60 seconds to stuck on 75%. It stuck because it ate 10GB of my 16GB RAM. Expected
+- 113 seconds, 12GB RAM. Bad as expected
+
+## 2. Naive but a bit better
+
+- Read IPs in blocks in a routine
+- Use buffered channel to send IPs
+- Store as uint32 at `map[uint32]bool`
+- Get len
+
+Performance on 1GB IPs:
+
+- 26 seconds, 14.5GB RAM
+
+Analysis:
+
+- Map works much faster with uint32 representation of IP.
+- I should manage memory better

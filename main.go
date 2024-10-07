@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"math"
 )
 
 const (
@@ -9,22 +10,19 @@ const (
 )
 
 func countIPs() {
-	log.Println("Processing %:")
+	hashset := map[uint32]bool{}
+	totalCount := uint32(0)
 
-	hashset := map[string]bool{}
-	totalCount := uint64(0)
-	lastReportedPercent := uint8(0)
-	for ip, progress := range getIP(filename) {
-		if progress.err != nil {
-			log.Fatalf("Error reading file: %v", progress.err)
-			return
-		}
+	ips := make(chan [4]byte, 100)
+	go readIPs(filename, ips)
+
+	for ip := range ips {
 		totalCount += 1
-		hashset[ip] = true
-		if progress.percent != lastReportedPercent {
-			log.Printf("  %d%%\n", progress.percent)
-			lastReportedPercent = progress.percent
+		hash := uint32(0)
+		for i := range 4 {
+			hash += uint32(ip[i]) * uint32(math.Pow(float64(256), float64(i)))
 		}
+		hashset[hash] = true
 	}
 
 	uniqCount := len(hashset)

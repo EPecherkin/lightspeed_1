@@ -43,7 +43,7 @@ func main() {
 			}
 		}
 
-		batchData := strings.Join(ipBatch[:], "\n")
+		batchData := strings.Join(ipBatch[:], "\n") + "\n"
 
 		// Write the batch to the file
 		bytesWritten, err := file.WriteString(batchData)
