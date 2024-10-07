@@ -23,13 +23,16 @@ You should calculate the number of unique addresses in this file using as little
 
 # Solution
 
-## Start with naive
+- Run in docker
+- perfmon.csv has performance stats as `seconds,allocs(MB),mallocs(MB),cpus,goroutines`
+
+## 1. Naive and blunt
 
 - Read IPs in blocks
-- Convert to uint32 (4 bytes hash)
-- Store
+- Use iterator to process IP one by one
+- Store as strings at `map[string]bool`
 - Get len
 
 Performance on 1GB IPs:
 
--
+- Took 60 seconds to stuck on 75%. It stuck because it ate 10GB of my 16GB RAM. Expected
