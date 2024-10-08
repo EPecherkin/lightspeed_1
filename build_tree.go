@@ -2,35 +2,40 @@ package main
 
 import (
 	"log"
-	// "sync"
+	"sync"
 )
 
 type Node struct {
 	children map[byte]*Node
+	mu       sync.Mutex
 }
 
 const (
 	maxPos = 32 // 32 bits max
 )
 
-func add(root *Node, ip [4]byte) uint64 {
+func add(root *Node, ip [4]byte, wg sync.WaitGroup) {
 	node := root
-	isNew := uint64(0)
+	wg.Add(1)
 
 	for i := range 4 {
+		mu := node.mu
+		mu.Lock()
 		if node.children[ip[i]] == nil {
-			isNew = 1
 			tnode := Node{children: map[byte]*Node{}}
 			tnode.children[ip[i]] = &tnode
 			node = &tnode
 		} else {
 			node = node.children[ip[i]]
 		}
+		mu.Unlock()
 	}
-	return isNew
+	wg.Done()
 }
 
 func buildTree(ips chan [4]byte) {
+	wg := sync.WaitGroup{}
+
 	root := Node{}
 
 	totalCount := uint64(0)
@@ -38,8 +43,9 @@ func buildTree(ips chan [4]byte) {
 
 	for ip := range ips {
 		totalCount += 1
-		uniqCount += add(&root, ip)
+		go add(&root, ip, wg)
 	}
+	wg.Wait()
 
 	log.Printf("Amount of IPs: %d\n", totalCount)
 	log.Printf("Amount of uniq IPs: %d\n", uniqCount)

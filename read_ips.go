@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	readChunkSize = 512 * 1024 * 1024 // 100 MB
+	readChunkSize = 256 * 1024 * 1024 // 100 MB
 )
 
 func readIPs(filename string, ips chan [4]byte) {

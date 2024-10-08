@@ -32,8 +32,8 @@ func trackUsage(quit chan bool) {
 			runtime.ReadMemStats(&mem)
 
 			seconds := time.Now().Sub(started).Seconds()
-			alloc := mem.Alloc / (1024 * 1024) // convert to MB
-			malloc := mem.Mallocs / (1024 * 1024)   // convert to MB
+			alloc := mem.Alloc / (1024 * 1024)    // convert to MB
+			malloc := mem.Mallocs / (1024 * 1024) // convert to MB
 			_, err := file.WriteString(fmt.Sprintf("%f,%d,%d,%d,%d\n", seconds, alloc, malloc, runtime.NumCPU(), runtime.NumGoroutine()))
 			if err != nil {
 				log.Printf("Error writing performance data: %v\n", err)
