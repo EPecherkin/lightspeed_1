@@ -3,7 +3,7 @@ package main
 import ()
 
 const (
-	filename = "ips_b.txt"
+	filename = "ips.txt"
 )
 
 func countIPs() {
