@@ -10,7 +10,7 @@ const (
 	readChunkSize = 100 * 1024 * 1024 // 100 MB
 )
 
-func readIPs(filename string, ips chan [4]byte) {
+func readIPs(filename string, ips chan uint32) {
 	file, err := os.Open(filename)
 	if err != nil {
 		log.Printf("Error reading %s: %v\n", filename, err)
@@ -32,10 +32,10 @@ func readIPs(filename string, ips chan [4]byte) {
 	lastReportedPercent := uint8(0)
 
 	fileBuffer := make([]byte, readChunkSize)
-	ip := [4]byte{}
-	ipK := 0
+	ip := uint32(0)
+	ipSegN := 0
 	seg := byte(0)
-	segK := 0
+	segCharN := 0
 
 	for {
 		bytesRead, err := file.Read(fileBuffer)
@@ -50,32 +50,32 @@ func readIPs(filename string, ips chan [4]byte) {
 
 			char := fileBuffer[i]
 			if char == '\n' || char == '.' { // TODO: last line break might be missing
-				if ipK > 3 {
+				if ipSegN > 3 {
 					log.Printf("%s seems to be malformed at position %d", filename, processedSize)
 					close(ips)
 					return
 				}
 
-				ip[ipK] = seg
+				ip = ip << 8 + uint32(seg)
 				seg = 0
-				segK = 0
+				segCharN = 0
 
 				if char == '\n' {
-					ipK = 0
+					ipSegN = 0
 					ips <- ip
-					ip = [4]byte{}
+					ip = uint32(0)
 				} else { // '.'
-					ipK += 1
+					ipSegN += 1
 				}
 			} else {
 				num := char - '0'
-				if num < 0 || num > 9 || segK > 2 {
+				if num < 0 || num > 9 || segCharN > 2 {
 					log.Printf("%s seems to be malformed at position %d", filename, processedSize)
 					close(ips)
 					return
 				}
 				seg = seg*10 + num
-				segK += 1
+				segCharN += 1
 			}
 
 			percent := uint8(float64(processedSize) / float64(totalSize) * 100.0)
