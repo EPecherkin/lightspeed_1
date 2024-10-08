@@ -1,59 +1,45 @@
 package main
 
 import (
-  "log"
-  // "sync"
+	"log"
+	// "sync"
 )
 
 type Node struct {
-  seg byte
-  children []*Node
+	children map[byte]*Node
 }
 
 const (
-  maxPos = 32 // 32 bits max
+	maxPos = 32 // 32 bits max
 )
 
 func add(root *Node, ip [4]byte) uint64 {
-  node := root
-  isNew := uint64(0)
-  // log.Printf("%v ", ip)
+	node := root
+	isNew := uint64(0)
 
-  for i := range 4 {
-    // log.Printf("%v %v, %v", ip[i], i, len(node.children))
-    k := 0
-    found := false
-    for k < len(node.children) {
-      tnode := node.children[k]
-      if tnode.seg == ip[i] {
-        // log.Printf("found %v at %v", tnode.seg, k)
-        node = tnode
-        found = true
-        break
-      }
-      k += 1
-    }
-    if !found {
-      tnode := Node{seg: ip[i]}
-      // log.Printf("created %v for %v at %v", tnode.seg, node.seg, k)
-      node.children = append(node.children, &tnode)
-      node = &tnode
-      isNew = 1
-    }
-  }
-  return isNew
+	for i := range 4 {
+		if node.children[ip[i]] == nil {
+			isNew = 1
+			tnode := Node{children: map[byte]*Node{}}
+			tnode.children[ip[i]] = &tnode
+			node = &tnode
+		} else {
+			node = node.children[ip[i]]
+		}
+	}
+	return isNew
 }
 
 func buildTree(ips chan [4]byte) {
-  root := Node{}
+	root := Node{}
 
-  totalCount := uint64(0)
-  uniqCount := uint64(0)
+	totalCount := uint64(0)
+	uniqCount := uint64(0)
 
 	for ip := range ips {
-    totalCount += 1
-    uniqCount += add(&root, ip)
-  }
+		totalCount += 1
+		uniqCount += add(&root, ip)
+	}
 
 	log.Printf("Amount of IPs: %d\n", totalCount)
 	log.Printf("Amount of uniq IPs: %d\n", uniqCount)

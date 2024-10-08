@@ -1,17 +1,16 @@
 package main
 
-import (
-)
+import ()
 
 const (
-	filename = "ips.txt"
+	filename = "ips_b.txt"
 )
 
 func countIPs() {
 	ips := make(chan [4]byte, 1000)
 	go readIPs(filename, ips)
 
-  buildTree(ips)
+	buildTree(ips)
 }
 
 func main() {
