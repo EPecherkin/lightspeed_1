@@ -19,7 +19,10 @@ You have a simple text file with IPv4 addresses. One line is one address, line b
 
 The file is unlimited in size and can occupy tens and hundreds of gigabytes.
 
-You should calculate the number of unique addresses in this file using as little memory and time as possible. There is a "naive" algorithm for solving this problem (read line by line, put lines into HashSet). It's better if your implementation is more complicated and faster than this naive algorithm.
+You should calculate the number of unique addresses in this file using as
+little memory and time as possible. There is a "naive" algorithm for solving
+this problem (read line by line, put lines into HashSet). It's better if your
+implementation is more complicated and faster than this naive algorithm.
 
 # Solution
 
@@ -50,5 +53,13 @@ Performance on 1GB IPs:
 
 Analysis:
 
-- Map works much faster with uint32 representation of IP.
+- Map works much faster with uint32 representation of IP
 - I should manage memory better
+
+Attempt #1: Manual runtime.GC didn't work. debug.FreeOSMemory didn't work. A memory leak?
+
+Attempt #2: Optimized file read. 13.5 GB. Still not great.
+
+Attempt #3: Optimize file read even more. Read and parse by bite. 3GB RAM, 27 seconds
+
+## 3. Naive but communicate reading and parsing in routines

@@ -1,12 +1,9 @@
 package main
 
 import (
-	"bytes"
 	"io"
 	"log"
 	"os"
-	"strconv"
-	"strings"
 )
 
 const (
@@ -34,11 +31,14 @@ func readIPs(filename string, ips chan [4]byte) {
 	processedSize := uint64(0)
 	lastReportedPercent := uint8(0)
 
-	var ipBuf bytes.Buffer
+	fileBuffer := make([]byte, readChunkSize)
+	ip := [4]byte{}
+	ipK := 0
+	seg := byte(0)
+	segK := 0
 
 	for {
-		buffer := make([]byte, readChunkSize)
-		bytesRead, err := file.Read(buffer)
+		bytesRead, err := file.Read(fileBuffer)
 		if err != nil && err != io.EOF {
 			log.Printf("Error reading data from %s: %v\n", filename, err)
 			close(ips)
@@ -47,38 +47,41 @@ func readIPs(filename string, ips chan [4]byte) {
 
 		for i := range bytesRead {
 			processedSize += 1
-			char := buffer[i]
-			if char == '\n' { // TODO: last line break might be missing
 
-				ip := ipBuf.String()
-				ipSegments := strings.Split(ip, ".")
-				ipBytes := [4]byte{}
-				if len(ipSegments) != 4 {
-					log.Printf("%s seems to be malformed. Can't parse `%s`", filename, ip)
+			char := fileBuffer[i]
+			if char == '\n' || char == '.' { // TODO: last line break might be missing
+				if ipK > 3 {
+					log.Printf("%s seems to be malformed at position %d", filename, processedSize)
 					close(ips)
 					return
 				}
-				for k := range 4 {
-					segByte, err := strconv.ParseUint(ipSegments[k], 10, 8)
-					if err != nil {
-						log.Printf("%s seems to be malformed. Can't parse segment %s of `%s`: %v", filename, ipSegments[k], ip, err)
-						close(ips)
-						return
-					}
-					ipBytes[k] = byte(segByte)
-				}
 
-				ips <- ipBytes
+				ip[ipK] = seg
+				seg = 0
+				segK = 0
 
-				ipBuf = bytes.Buffer{}
-
-				percent := uint8(float64(processedSize) / float64(totalSize) * 100.0)
-				if lastReportedPercent != percent {
-					log.Printf("  %d%%", percent)
-					lastReportedPercent = percent
+				if char == '\n' {
+					ipK = 0
+					ips <- ip
+					ip = [4]byte{}
+				} else { // '.'
+					ipK += 1
 				}
 			} else {
-				ipBuf.WriteByte(char)
+				num := char - '0'
+				if num < 0 || num > 9 || segK > 2 {
+					log.Printf("%s seems to be malformed at position %d", filename, processedSize)
+					close(ips)
+					return
+				}
+				seg = seg*10 + num
+				segK += 1
+			}
+
+			percent := uint8(float64(processedSize) / float64(totalSize) * 100.0)
+			if lastReportedPercent != percent {
+				log.Printf("  %d%%", percent)
+				lastReportedPercent = percent
 			}
 		}
 
