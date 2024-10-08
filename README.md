@@ -38,7 +38,7 @@ implementation is more complicated and faster than this naive algorithm.
 
 Performance on 1GB IPs:
 
-- 113 seconds, 12GB RAM. Bad as expected
+- 113 seconds, 6.7GB RAM. Bad as expected
 
 ## 2. Naive with hash instead of string
 
@@ -49,18 +49,7 @@ Performance on 1GB IPs:
 
 Performance on 1GB IPs:
 
-- 26 seconds, 14.5GB RAM
-
-Analysis:
-
-- Map works much faster with uint32 representation of IP
-- I should manage memory better
-
-Attempt #1: Manual runtime.GC didn't work. debug.FreeOSMemory didn't work. A memory leak?
-
-Attempt #2: Optimized file read. 13.5 GB. Still not great.
-
-Attempt #3: Optimize file read even more. Read and parse by bite. 3GB RAM, 27 seconds
+- 26 seconds, 1.5GB RAM
 
 Performance on 3GB IPs:
 
