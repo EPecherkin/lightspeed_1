@@ -44,7 +44,7 @@ Performance on 1GB IPs:
 
 - Read IPs in blocks in a routine
 - Use buffered channel to send IPs
-- Store as uint32 at `map[uint32]bool`
+- Store as uint32 at `map[uin32]bool`
 - Get len
 
 Performance on 1GB IPs:
@@ -70,7 +70,7 @@ Performance on 3GB IPs:
 
 - Read IPs in blocks in a routine
 - Use buffered channel to send IPs
-- Store as uint32 at `map[byte]map[byte]map[byte]map[byte]bool`
+- Store ips at `map[byte]map[byte]map[byte]map[byte]bool`
 - Sum lens
 
 Performance on 1GB IPs:
@@ -81,4 +81,9 @@ Performance on 1GB IPs:
 
 - 180 seconds, 3GB, kind of better
 
-## 4. Map of maps, but parse / process in routines
+## 4. A better solution with prefix tree
+
+- Read IPs in blocks in a routine
+- Use buffered channel to send IPs
+- Store ips at a tree of `Node { data string, children [10]Node }`
+- Count leafs
