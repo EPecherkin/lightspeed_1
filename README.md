@@ -40,7 +40,7 @@ Performance on 1GB IPs:
 
 - 113 seconds, 12GB RAM. Bad as expected
 
-## 2. Naive but a bit better
+## 2. Naive with hash instead of string
 
 - Read IPs in blocks in a routine
 - Use buffered channel to send IPs
@@ -62,4 +62,23 @@ Attempt #2: Optimized file read. 13.5 GB. Still not great.
 
 Attempt #3: Optimize file read even more. Read and parse by bite. 3GB RAM, 27 seconds
 
-## 3. Naive but communicate reading and parsing in routines
+Performance on 3GB IPs:
+
+- 388 seconds, about 10 GB
+
+## 3. Map of map of map of map
+
+- Read IPs in blocks in a routine
+- Use buffered channel to send IPs
+- Store as uint32 at `map[byte]map[byte]map[byte]map[byte]bool`
+- Sum lens
+
+Performance on 1GB IPs:
+
+- 53 seconds, 2GB
+
+ Performance on 3GB IPs:
+
+- 180 seconds, 3GB, kind of better
+
+## 4. Map of maps, but parse / process in routines

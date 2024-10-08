@@ -2,7 +2,6 @@ package main
 
 import (
 	"log"
-	"math"
 )
 
 const (
@@ -10,22 +9,41 @@ const (
 )
 
 func countIPs() {
-	hashset := map[uint32]bool{}
-	totalCount := uint32(0)
+	hashset := map[byte]map[byte]map[byte]map[byte]bool{}
+	totalCount := uint64(0)
 
-	ips := make(chan [4]byte, 100)
+	ips := make(chan [4]byte, 1000)
 	go readIPs(filename, ips)
 
 	for ip := range ips {
 		totalCount += 1
-		hash := uint32(0)
-		for i := range 4 {
-			hash += uint32(ip[i]) * uint32(math.Pow(float64(256), float64(i)))
+
+		if hashset[ip[0]] == nil {
+			hashset[ip[0]] = map[byte]map[byte]map[byte]bool{}
 		}
-		hashset[hash] = true
+		m2 := hashset[ip[0]]
+
+		if m2[ip[1]] == nil {
+			m2[ip[1]] = map[byte]map[byte]bool{}
+		}
+		m3 := m2[ip[1]]
+
+		if m3[ip[2]] == nil {
+			m3[ip[2]] = map[byte]bool{}
+		}
+		m4 := m3[ip[2]]
+
+		m4[ip[3]] = true
 	}
 
-	uniqCount := len(hashset)
+	uniqCount := uint32(0)
+	for _, m2 := range hashset {
+		for _, m3 := range m2 {
+			for _, m4 := range m3 {
+				uniqCount += uint32(len(m4))
+			}
+		}
+	}
 
 	log.Printf("Amount of IPs: %d\n", totalCount)
 	log.Printf("Amount of uniq IPs: %d\n", uniqCount)
