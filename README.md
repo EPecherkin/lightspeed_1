@@ -58,6 +58,7 @@ Performance on 3GB IPs:
 ## 3. Map of map of map of map
 
 - Read IPs in blocks in a routine
+- Represent IP as `4[byte]`, where each item is a segment
 - Use buffered channel to send IPs
 - Store ips at `map[byte]map[byte]map[byte]map[byte]bool`
 - Sum lens
@@ -69,6 +70,7 @@ Performance:
 ## 4. Prefix tree using segment as a node
 
 - Read IPs in blocks in a routine
+- Represent IP as `4[byte]`, where each item is a segment
 - Use buffered channel to send IPs
 - Store ips at a tree of `Node { children map[byte]*Node }`
 - Count insertions
@@ -76,3 +78,15 @@ Performance:
 Performance on 1GB IPs:
 
 - another bad idea
+
+## 5. Radix tree
+
+- Read IPs in blocks in a routine
+- Represent IP as `[10]byte`, where each item is a digit of uint32 representation
+- Use buffered channel to send IPs
+- Store ips at a tree of `Node { digits []byte, children []*Node }`
+- Count insertions
+
+Performance on 1GB IPs:
+
+- 937 seconds, 7 GB Ram

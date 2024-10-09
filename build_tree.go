@@ -1,57 +1,87 @@
 package main
 
 import (
-	// "log"
-	// "sync"
+  // "fmt"
+  "log"
+  // "strconv"
+  // "sync"
 )
 
 type Node struct {
-	children map[byte]*Node
-	// mu       sync.Mutex
+  digits []byte
+  children []*Node
 }
 
-const (
-)
+func add(root *Node, ipDigits *[10]byte) byte {
+  node := root
+  digits := ipDigits[:]
 
-func add(root *Node, ip [4]byte) {
-	node := root
+  inserted := byte(0)
 
-	for i := range 4 {
-		// mu := &node.mu
-		// mu.Lock()
-		if node.children[ip[i]] == nil {
-			tnode := Node{children: map[byte]*Node{}}
-			node.children[ip[i]] = &tnode
-		}
-		node = node.children[ip[i]]
-		// mu.Unlock()
-	}
+  for len(digits) > 0 {
+    // log.Printf("digits %v", digits)
+    targetNode := (*Node)(nil)
+    for i := range len(node.children) {
+      tnode := node.children[i]
+      digitsLen := len(tnode.digits)
+      // log.Printf("checking node %v", tnode)
+
+      // Find first difference position
+      k := 0
+      for k < digitsLen {
+        if digits[k] != tnode.digits[k] {
+          break
+        }
+        k++
+      }
+      // log.Printf("k %v", k)
+
+      if k == 0 { // no match at all, check other nodes
+        continue
+      }
+
+      if (k == digitsLen) && (len(digits) == len(tnode.digits)) { // exact match
+          // log.Printf("exact match")
+        return 0
+      } else { // target node found
+        digits = digits[k:]
+        targetNode = tnode
+        if (k < digitsLen) {
+          inserted = 1
+          tdigits := tnode.digits[:k]
+          cdigits := tnode.digits[k:]
+          // log.Printf("subset, inserted %v %v", tdigits, cdigits)
+          cnode := Node{digits: cdigits, children: tnode.children}
+          tnode.digits = tdigits
+          tnode.children = []*Node{&cnode}
+        }
+        break
+      }
+    }
+    if targetNode == nil {
+      // log.Printf("no target node, inserted")
+      inserted = 1
+      nnode := Node{digits: digits}
+      targetNode = &nnode
+      node.children = append(node.children, targetNode)
+      break
+    }
+    node = targetNode
+  }
+  return inserted
 }
 
-// func buildTreeRoutine(ips chan [4]byte, wg *sync.WaitGroup) {
-func buildTreeRoutine(ips chan [4]byte) {
-  // wg.Add(1)
-  // defer wg.Done()
-
-	root := Node{children: map[byte]*Node{}}
+func buildTree(ips chan *[10]byte) uint64 {
+  root := Node{}
+  totalCount := uint64(0)
+  uniqCount := uint64(0)
 
 	for ip := range ips {
-    add(&root, ip)
-	}
-}
+    totalCount++
+    uniqCount += uint64(add(&root, ip))
+  }
 
-func buildTree(ips chan [4]byte) {
-	// wg := sync.WaitGroup{}
-
-  // for _ = range concurrency {
-  //   go buildTreeRoutine(ips, &wg)
-  // }
-  // for _ = range concurrency {
-    buildTreeRoutine(ips)
-  // }
-
-	// wg.Wait()
-
-	// log.Printf("Amount of IPs: %d\n", 0)
-	// log.Printf("Amount of uniq IPs: %d\n", uniqCount)
+	log.Printf("Amount of IPs: %d\n", totalCount)
+	log.Printf("Amount of uniq IPs: %d\n", uniqCount)
+  return 1
 }

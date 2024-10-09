@@ -7,10 +7,10 @@ import (
 )
 
 const (
-	readChunkSize = 256 * 1024 * 1024 // 100 MB
+	readChunkSize = 100 * 1024 * 1024 // 100 MB
 )
 
-func readIPs(filename string, ips chan [4]byte) {
+func readIPs(filename string, ips chan *[10]byte) {
 	file, err := os.Open(filename)
 	if err != nil {
 		log.Printf("Error reading %s: %v\n", filename, err)
@@ -32,7 +32,7 @@ func readIPs(filename string, ips chan [4]byte) {
 	lastReportedPercent := uint8(0)
 
 	fileBuffer := make([]byte, readChunkSize)
-	ip := [4]byte{}
+	ip := uint32(0)
 	ipSegN := 0
 	seg := byte(0)
 	segCharN := 0
@@ -46,7 +46,7 @@ func readIPs(filename string, ips chan [4]byte) {
 		}
 
 		for i := range bytesRead {
-			processedSize += 1
+			processedSize++
 
 			char := fileBuffer[i]
 			if char == '\n' || char == '.' { // TODO: last line break might be missing
@@ -56,16 +56,20 @@ func readIPs(filename string, ips chan [4]byte) {
 					return
 				}
 
-				ip[ipSegN] = seg
+				ip = ip << 8 + uint32(seg)
 				seg = 0
 				segCharN = 0
 
 				if char == '\n' {
 					ipSegN = 0
-					ips <- ip
-					ip = [4]byte{}
+          ipDigits := [10]byte{}
+          for k := 0; ip != 0; k++ {
+            ipDigits[10-k-1] = byte(ip % 10)
+            ip /= 10
+          }
+					ips <- &ipDigits
 				} else { // '.'
-					ipSegN += 1
+					ipSegN++
 				}
 			} else {
 				num := char - '0'
@@ -75,7 +79,7 @@ func readIPs(filename string, ips chan [4]byte) {
 					return
 				}
 				seg = seg*10 + num
-				segCharN += 1
+				segCharN++
 			}
 
 			percent := uint8(float64(processedSize) / float64(totalSize) * 100.0)
