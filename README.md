@@ -53,7 +53,7 @@ Performance on 1GB IPs:
 
 Performance on 3GB IPs:
 
-- 388 seconds, about 10 GB
+- 211 seconds, about 6 GB
 
 ## 3. Map of map of map of map
 
@@ -62,17 +62,17 @@ Performance on 3GB IPs:
 - Store ips at `map[byte]map[byte]map[byte]map[byte]bool`
 - Sum lens
 
-Performance on 1GB IPs:
+Performance:
 
-- 53 seconds, 2GB
+- that was a bad idea
 
- Performance on 3GB IPs:
-
-- 180 seconds, 3GB, kind of better
-
-## 4. A better solution with prefix tree
+## 4. Prefix tree using segment as a node
 
 - Read IPs in blocks in a routine
 - Use buffered channel to send IPs
-- Store ips at a tree of `Node { data string, children [10]Node }`
-- Count leafs
+- Store ips at a tree of `Node { children map[byte]*Node }`
+- Count insertions
+
+Performance on 1GB IPs:
+
+- another bad idea
