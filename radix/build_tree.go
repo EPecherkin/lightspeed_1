@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 )
 
@@ -40,7 +41,6 @@ func add(root *Node, ipDigits *[10]byte) byte {
 				digits = digits[k:]
 				nextNode = tnode
 				if k < digitsLen {
-					inserted = 1
 					tdigits := tnode.digits[:k]
 					cdigits := tnode.digits[k:]
 					cnode := Node{digits: cdigits, children: tnode.children}
@@ -62,6 +62,24 @@ func add(root *Node, ipDigits *[10]byte) byte {
 	return inserted
 }
 
+func printTree(root *Node, count uint64) {
+	line := [][]*Node{[]*Node{root}}
+
+	for _ = range count {
+		nextline := [][]*Node{}
+		for i := range line {
+			fmt.Print("[")
+			for k := range line[i] {
+				fmt.Printf("%v", line[i][k].digits)
+				nextline = append(nextline, line[i][k].children)
+			}
+			fmt.Print("] ")
+		}
+		line = nextline
+		fmt.Println("")
+	}
+}
+
 func buildTree(ips chan *[10]byte) {
 	root := Node{}
 	totalCount := uint64(0)
@@ -71,6 +89,7 @@ func buildTree(ips chan *[10]byte) {
 		totalCount++
 		uniqCount += uint64(add(&root, ip))
 	}
+	printTree(&root, uniqCount)
 
 	log.Printf("Amount of IPs: %d\n", totalCount)
 	log.Printf("Amount of uniq IPs: %d\n", uniqCount)
