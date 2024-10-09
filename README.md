@@ -89,4 +89,4 @@ Performance on 1GB IPs:
 
 Performance on 1GB IPs:
 
-- 937 seconds, 7 GB Ram
+- 937 seconds, 7 GB Ram. Very bad

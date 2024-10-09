@@ -10,7 +10,7 @@ const (
 	readChunkSize = 100 * 1024 * 1024 // 100 MB
 )
 
-func readIPs(filename string, ips chan *[10]byte) {
+func readIPs(filename string, ips chan uint32) {
 	file, err := os.Open(filename)
 	if err != nil {
 		log.Printf("Error reading %s: %v\n", filename, err)
@@ -62,12 +62,8 @@ func readIPs(filename string, ips chan *[10]byte) {
 
 				if char == '\n' {
 					ipSegN = 0
-					ipDigits := [10]byte{}
-					for k := 0; ip != 0; k++ {
-						ipDigits[10-k-1] = byte(ip % 10)
-						ip /= 10
-					}
-					ips <- &ipDigits
+					ips <- ip
+					ip = uint32(0)
 				} else { // '.'
 					ipSegN++
 				}
