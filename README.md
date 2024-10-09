@@ -89,6 +89,26 @@ Performance on 1GB IPs:
 
 Performance on 1GB IPs:
 
-- 937 seconds, 7 GB Ram. Very bad
+- 937 seconds, 7 GB Ram. Another bad idea. Well, no point to optimize RAM usage then
 
-## 6. `[256][256][256]byte`
+## 6. `[256][256][256][256]byte`
+
+- Read IPs in blocks in a routine
+- Represent IP as `[4]byte`, where each byte is a segment
+- Use buffered channel to send IPs
+- Store IPs at a table of `[256][256][256][256]byte`
+- Count insertions
+
+Performance on 1GB IPs:
+
+- 16 seconds
+- ALWAYS 4GB Ram
+
+Pros:
+
+- Quick
+- Uses the same amount of memory(4GB) despite the size of the file
+
+Cons:
+
+- Uses the same amount of memory(4GB) despite the size of the file

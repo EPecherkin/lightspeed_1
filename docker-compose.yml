@@ -5,6 +5,8 @@ services:
     image: lightspeed_1
     build: .
     volumes:
-      - ./ips.txt:/app/ips.txt
+      - ./ips_1.txt:/app/ips.txt
       # - ./run.sh:/app/run.sh
       - ./perfmon.csv:/app/perfmon.csv
+    environment:
+      - IPS_FILE=/app/ips.txt
