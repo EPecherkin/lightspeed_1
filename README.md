@@ -91,7 +91,7 @@ Performance on 1GB IPs:
 
 - 937 seconds, 7 GB Ram. Another bad idea. Well, no point to optimize RAM usage then
 
-## 6. `[256][256][256][256]byte`
+## 6. Table `[256][256][256][256]byte`
 
 - Read IPs in blocks in a routine
 - Represent IP as `[4]byte`, where each byte is a segment
@@ -112,3 +112,35 @@ Pros:
 Cons:
 
 - Uses the same amount of memory(4GB) despite the size of the file
+
+Improvements:
+
+- We store just one value in 8 bits. We can compress that.
+
+## 7. Table v2 `[256][256][256][64]byte`
+
+- Read IPs in blocks in a routine
+- Represent IP as `[4]byte`, where each byte is a segment
+- Use buffered channel to send IPs
+- Store IPs at a table of `[256][256][256][32]byte`
+- For the last byte, mod 32 to get target index, use binary operations to set it
+- Count insertions
+
+Performance on 1GB IPs:
+
+- 16 seconds
+- ALWAYS 4GB Ram
+
+Pros:
+
+- Quick
+- Uses the same amount of memory(4GB) despite the size of the file
+
+Cons:
+
+- Uses the same amount of memory(4GB) despite the size of the file
+
+## 8. Theoretical solution on how to do the same but use less memory
+
+- Read IPs in 100MB blocks
+- Given that each character in a string is 2 bytes, we can represent any IP with with just a 2 characters "ab"
