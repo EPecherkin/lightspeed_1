@@ -178,7 +178,7 @@ Performance on 1GB IPs:
 
 ## Bonus. Theoretical solution on how to solve the task if we have less than 512MB RAM
 
-- Read IPs in 100MB blocks
+- Read IPs in 1MB blocks
 - Given that each character in a string is 2 bytes, we can represent any IP with with just 2 characters "ab"
 - Use `buffer [50*1024*1024]uint16` (50 MB) to store IPs, store it's actual len at `blen`
 - Insert IPs into buffer. Use binary search to find a place for insertion, `memcpy(pos+2, pos, blen)` block
@@ -198,3 +198,4 @@ Possibility for improvements:
 
 - Use goroutines to search for IP in multiple files in parallel
 - If we expect memory to be highly fragmented - we can divide in-memory buffer to a smaller chunks, but insertion will become more complicated
+- We can spend even less memory, but performance is going to be the price
