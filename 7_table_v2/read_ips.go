@@ -28,10 +28,11 @@ func readIPs(filename string, ips chan [4]byte) {
 	totalSize := stat.Size()
 
 	log.Printf("Reading %s %%:\n", filename)
+
+	fileBuffer := make([]byte, readChunkSize)
 	processedSize := uint64(0)
 	lastReportedPercent := uint8(0)
 
-	fileBuffer := make([]byte, readChunkSize)
 	ip := [4]byte{}
 	ipSegN := 0
 	seg := byte(0)
