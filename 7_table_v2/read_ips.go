@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	readChunkSize = 1024 * 1024 * 1024 // 1024 MB
+	readChunkSize = 10 * 1024 * 1024 // 10MB. Even 1 MB is enough, making it bigger doesn't make it faster on my machine, but this reduces the amount of calls, that might help with HDD. Frankly speaking, I would increase it even more for HDD
 )
 
 func readIPs(filename string, ips chan [4]byte) {
@@ -34,9 +34,9 @@ func readIPs(filename string, ips chan [4]byte) {
 	lastReportedPercent := uint8(0)
 
 	ip := [4]byte{}
-	ipSegN := 0
+	ipSegN := 0 // what segment of IP we are building right now
 	seg := byte(0)
-	segCharN := 0
+	segCharN := 0 // what digit of segment should be retrieved next
 
 	for {
 		bytesRead, err := file.Read(fileBuffer)
@@ -46,10 +46,13 @@ func readIPs(filename string, ips chan [4]byte) {
 			return
 		}
 
+		// By-byte parsing, thanks that this big ip_addresses.txt uses ascii encoding
 		for i := range bytesRead {
 			processedSize++
 
 			char := fileBuffer[i]
+			// Any attempt to refactor that just makes it more complicated, since we need to pass multiple values by pointers
+			// and still need to handle conditions about malformed file
 			if char == '\n' || char == '.' { // NOTE: That won't handle the case when the last \n is missing. But I double checked the file from the task - it is there so we ignore that case
 				if ipSegN > 3 {
 					log.Printf("%s seems to be malformed at position %d", filename, processedSize)
@@ -69,7 +72,7 @@ func readIPs(filename string, ips chan [4]byte) {
 					ipSegN++
 				}
 			} else {
-				num := char - '0'
+				num := char - '0' // a little bit of ASII magic
 				if num < 0 || num > 9 || segCharN > 2 {
 					log.Printf("%s seems to be malformed at position %d", filename, processedSize)
 					close(ips)

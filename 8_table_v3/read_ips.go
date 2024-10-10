@@ -7,8 +7,8 @@ import (
 )
 
 const (
-	readChunkSize     = 512 * 1024 * 1024 // 1024 MB
-	blocksChannelSize = 4
+	readChunkSize     = 1 * 1024 * 1024 // 1 MB
+	blocksChannelSize = 10
 )
 
 type Block struct {
@@ -61,15 +61,18 @@ func readIPs(filename string, ips chan [4]byte) {
 	lastReportedPercent := uint8(0)
 
 	ip := [4]byte{}
-	ipSegN := 0
+	ipSegN := 0 // what segment of IP we are building right now
 	seg := byte(0)
-	segCharN := 0
+	segCharN := 0 // what digit of segment should be retrieved next
 
 	for block := range blocks {
+		// By-byte parsing, thanks that this big ip_addresses.txt uses ascii encoding
 		for i := range block.size {
 			processedSize++
 
 			char := (*block.data)[i]
+			// Any attempt to refactor that just makes it more complicated, since we need to pass multiple values by pointers
+			// and still need to handle conditions about malformed file
 			if char == '\n' || char == '.' { // NOTE: That won't handle the case when the last \n is missing. But I double checked the file from the task - it is there so we ignore that case
 				if ipSegN > 3 {
 					log.Printf("%s seems to be malformed at position %d", filename, processedSize)
@@ -89,7 +92,7 @@ func readIPs(filename string, ips chan [4]byte) {
 					ipSegN++
 				}
 			} else {
-				num := char - '0'
+				num := char - '0' // a little bit of ASII magic
 				if num < 0 || num > 9 || segCharN > 2 {
 					log.Printf("%s seems to be malformed at position %d", filename, processedSize)
 					close(ips)

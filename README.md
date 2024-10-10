@@ -32,28 +32,7 @@ How to verify it:
 - `docker compose up`
 - `perfmon.csv` has performance stats as `seconds,allocs(MB),mallocs(MB),cpus,goroutines`
 
-The best solution is #7. #8 was an attempt to optimize #7, but without success.
-
-## 8. Table v3. AKA Table v2 + separate goroutine to read the file
-
-- Same as #7, but read file blocks in a separate goroutine
-- Pass blocks to IP parser through buffered channel
-
-Performance on 10GB IPs:
-
-- 90 seconds
-- About 6GB RAM on spikes, 4GB RAM average
-
-Performance on 107GB IPs:
-
-- 610 seconds
-- About 7GB RAM on spikes, 4GB RAM average
-
-Analisys:
-
-- Not worth it
-
-## 7. Table v2 `[256][256][256][64]byte`
+## 7. Final solution. Table v2 `[256][256][256][64]byte`
 
 - Read IPs in blocks in a routine
 - Represent IP as `[4]byte`, where each byte is a segment
@@ -65,17 +44,24 @@ Analisys:
 Performance on 1GB IPs:
 
 - 13 seconds
-- ALWAYS 1.5GB Ram
+- ALWAYS 0.5GB Ram
 
 Performance on 10GB IPs:
 
-- 100 seconds
+- 95 seconds
 
 Performance on 107GB IPs:
 
 - 612 seconds
 
-Pros/cons: same as #6
+Pros:
+
+- Quick
+- Uses the same amount of memory(0.5GB) despite the size of the file
+
+Cons:
+
+- Uses the same amount of memory(0.5GB) despite the size of the file
 
 Analysis if we can improve it even more:
 
@@ -83,6 +69,24 @@ Analysis if we can improve it even more:
 - Despite channel size spike up to the full limit some times, most of the times it's size is around 0
 - Reading the disk is the biggest issue
 - Attempt: read multiple blocks from disk in a goroutine with a buffered channel
+
+## 8. Table v3. AKA #7 + separate goroutine to read the file
+
+- Same as #7, but read file blocks in a separate goroutine
+- Pass blocks to IP parser through buffered channel
+
+Performance on 10GB IPs:
+
+- 90 seconds
+- About 1GB RAM on spikes, 0.6GB average
+
+Performance on 107GB IPs:
+
+- 600 seconds
+
+Analisys:
+
+- Double the memory for ~2% faster. Not worth it
 
 ## 6. Table `[256][256][256][256]byte`
 
