@@ -26,8 +26,22 @@ implementation is more complicated and faster than this naive algorithm.
 
 # Solutions
 
-- Run in docker
+- Run with docker
 - perfmon.csv has performance stats as `seconds,allocs(MB),mallocs(MB),cpus,goroutines`
+
+## 8. Table v3. AKA Table v2 + separate goroutine to read the file
+
+- Same as #7, but read file blocks in a separate goroutine
+- Pass blocks to IP parser through buffered channel
+
+Performance on 10GB IPs:
+
+- 90 seconds
+- About 6GB RAM on spikes, 4GB RAM average
+
+Analisys:
+
+- Not worth it
 
 ## 7. Table v2 `[256][256][256][64]byte`
 
@@ -43,7 +57,18 @@ Performance on 1GB IPs:
 - 13 seconds
 - ALWAYS 1.5GB Ram
 
+Performance on 10GB IPs:
+
+- 100 seconds
+
 Pros/cons: same as #6
+
+Analysis if we can improve it even more:
+
+- O(1) to check/set IP is present
+- Despite channel size spike up to the full limit some times, most of the times it's size is around 0
+- Reading the disk is the biggest issue
+- Attempt: read multiple blocks from disk in a goroutine with a buffered channel
 
 ## 6. Table `[256][256][256][256]byte`
 
@@ -154,4 +179,4 @@ IP lookup process:
 Possibility for improvements:
 
 - Use goroutines to search for IP in multiple files in parallel
-- If we expect memory to be highly fragmented - we can divide in-memory buffer to a smaller chunks
+- If we expect memory to be highly fragmented - we can divide in-memory buffer to a smaller chunks, but insertion will become more complicated
