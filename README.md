@@ -26,8 +26,13 @@ implementation is more complicated and faster than this naive algorithm.
 
 # Solutions
 
-- Run with docker
-- perfmon.csv has performance stats as `seconds,allocs(MB),mallocs(MB),cpus,goroutines`
+How to verify it:
+
+- Open docker-compose.yml, configure the first volume to pick the file you want to test with
+- `docker compose up`
+- `perfmon.csv` has performance stats as `seconds,allocs(MB),mallocs(MB),cpus,goroutines`
+
+The best solution is #7. #8 was an attempt to optimize #7, but without success.
 
 ## 8. Table v3. AKA Table v2 + separate goroutine to read the file
 
@@ -38,6 +43,11 @@ Performance on 10GB IPs:
 
 - 90 seconds
 - About 6GB RAM on spikes, 4GB RAM average
+
+Performance on 107GB IPs:
+
+- 610 seconds
+- About 7GB RAM on spikes, 4GB RAM average
 
 Analisys:
 
@@ -60,6 +70,10 @@ Performance on 1GB IPs:
 Performance on 10GB IPs:
 
 - 100 seconds
+
+Performance on 107GB IPs:
+
+- 612 seconds
 
 Pros/cons: same as #6
 

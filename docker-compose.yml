@@ -5,8 +5,7 @@ services:
     image: lightspeed_1
     build: .
     volumes:
-      - ./ips_1.txt:/app/ips.txt
-      # - ./run.sh:/app/run.sh
-      - ./perfmon.csv:/app/perfmon.csv
+      - ./ip_addresses.txt:/app/ip_addresses.txt # Specify location of the file with IPs list
+      - ./perfmon.csv:/app/perfmon.csv # Collected performance stats
     environment:
-      - IPS_FILE=/app/ips.txt
+      - IPS_FILE=/app/ip_addresses.txt

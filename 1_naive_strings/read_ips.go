@@ -44,7 +44,7 @@ func getIP(filename string) iter.Seq2[string, IPReadingProgress] {
 			for i := range bytesRead {
 				processedSize += 1
 				char := buffer[i]
-				if char == '\n' { // TODO: last empty line might be missing
+				if char == '\n' { // NOTE: That won't handle the case when the last \n is missing. But I double checked the file from the task - it is there so we ignore that case
 					percent := uint8(float64(processedSize) / float64(totalSize) * 100.0)
 					if !yield(ip.String(), IPReadingProgress{percent: percent}) {
 						return

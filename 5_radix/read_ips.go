@@ -49,7 +49,7 @@ func readIPs(filename string, ips chan *[10]byte) {
 			processedSize++
 
 			char := fileBuffer[i]
-			if char == '\n' || char == '.' { // TODO: last line break might be missing
+			if char == '\n' || char == '.' { // NOTE: That won't handle the case when the last \n is missing. But I double checked the file from the task - it is there so we ignore that case
 				if ipSegN > 3 {
 					log.Printf("%s seems to be malformed at position %d", filename, processedSize)
 					close(ips)

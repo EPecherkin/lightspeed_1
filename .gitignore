@@ -27,3 +27,4 @@ go.work.sum
 ips*.txt
 test.go
 perfmon.csv
+*/perfmon.go
