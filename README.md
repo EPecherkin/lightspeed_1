@@ -37,8 +37,9 @@ How to verify it:
 - Read IPs in blocks in a routine
 - Represent IP as `[4]byte`, where each byte is a segment
 - Use buffered channel to send IPs
-- Store IPs at a table of `[256][256][256][32]byte`
+- Store IPs at a table of `[256][256][256][32]byte` (because 32 * 8 = 256)
 - For the last byte, mod 32 to get target index, use binary operations to read/write it
+- 8 times less memory usage compared to solution #6
 - Count insertions
 
 Performance on 1GB IPs:
